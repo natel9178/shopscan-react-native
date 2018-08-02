@@ -1,15 +1,52 @@
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Camera, Permissions, Font } from 'expo';
+import { createStackNavigator } from 'react-navigation'
+import CameraView from './home/CameraView';
+import HomeContainer from './home/HomeContainer';
+import ReceiptHistoryContainer from './history/ReceiptHistory';
 
-export default class App extends React.Component<{}> {
-	render() {
+const MainStack = createStackNavigator(
+	{
+		Home: {
+			screen: HomeContainer, navigationOptions: ({ navigation }) => ({
+				header: null
+			}),
+		},
+		History: {
+			screen: ReceiptHistoryContainer, navigationOptions: ({ navigation }) => ({
+				header: null
+			}),
+		},
+	},
+	{
+		initialRouteName: 'Home',
+		headerMode: 'screen',
+		mode: 'modal',
+	}
+);
+
+
+interface IAppState {
+	fontLoaded: boolean
+}
+export default class App extends React.Component<{}, IAppState> {
+	constructor(props) {
+		super(props)
+		this.state = { fontLoaded: false }
+	}
+	public async componentWillMount() {
+		await Font.loadAsync({
+			'circular-medium': require('../assets/circular/circular-medium.otf'),
+			'circular-bold': require('../assets/circular/circular-bold.otf'),
+			'circular-book': require('../assets/circular/circular-book.otf'),
+		});
+		this.setState({ fontLoaded: true })
+	}
+	public render() {
 		return (
-			<View style={styles.container}>
-				<Text>Open up App.ts to start working on your app!</Text>
-				<Text>Changes you make will automatically reload.</Text>
-				<Text>Shake your phone to open the developer menu.</Text>
-			</View>
-		);
+			this.state.fontLoaded ? <MainStack /> : <View />
+		)
 	}
 }
 
