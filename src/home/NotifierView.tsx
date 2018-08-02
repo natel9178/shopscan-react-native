@@ -12,7 +12,7 @@ export default class NotifierView extends React.Component<INotifierViewProps, {}
     return (
       <BlurView style={[styles.container, this.props.style]} tint={'dark'} intensity={80}>
         <View style={{ flexDirection: 'row' }}>
-          <GradeCircleView text={'F'} />
+          <GradeCircleView grade={'F'} />
         </View>
         <Text style={{ fontFamily: 'circular-bold', fontSize: 24, textAlign: 'center', color: 'white', marginTop: 6 }}>Avg. Ethics Score</Text>
       </BlurView>

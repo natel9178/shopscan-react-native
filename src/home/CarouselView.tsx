@@ -19,7 +19,7 @@ export default class CarouselView extends React.Component<ICarouselProps, {}> {
   public _renderItem({ item, index }) {
     return (
       <View style={styles.cellContainer}>
-        <GradeCircleView viewStyle={styles.gradeStyle} textStyle={styles.gradeText} text={'F'} />
+        <GradeCircleView viewStyle={styles.gradeStyle} textStyle={styles.gradeText} grade={item.grade} />
         <View style={styles.cellTextContainer}>
           <Text style={styles.cellTitle}>{item.title}</Text>
           <Text style={styles.cellSubtitle}>{item.description}</Text>

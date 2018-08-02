@@ -5,26 +5,50 @@ import { createStackNavigator } from 'react-navigation'
 import CameraView from './home/CameraView';
 import HomeContainer from './home/HomeContainer';
 import ReceiptHistoryContainer from './history/ReceiptHistory';
+import { FluidNavigator } from 'react-navigation-fluid-transitions'
 
-const MainStack = createStackNavigator(
-	{
-		Home: {
-			screen: HomeContainer, navigationOptions: ({ navigation }) => ({
-				header: null
-			}),
-		},
-		History: {
-			screen: ReceiptHistoryContainer, navigationOptions: ({ navigation }) => ({
-				header: null
-			}),
-		},
-	},
-	{
-		initialRouteName: 'Home',
-		headerMode: 'screen',
-		mode: 'modal',
-	}
-);
+function forVertical(props) {
+	const { layout, position, scene } = props;
+
+	const index = scene.index;
+	const height = layout.initHeight;
+
+	const translateX = 0;
+	const translateY = position.interpolate({
+		inputRange: [index - 1, index, index + 1],
+		outputRange: [height, 0, 0]
+	});
+
+	return {
+		transform: [{ translateX }, { translateY }]
+	};
+}
+
+
+// const MainStack = createStackNavigator(
+// 	{
+// 		Home: {
+// 			screen: HomeContainer, navigationOptions: ({ navigation }) => ({
+// 				header: null
+// 			}),
+// 		},
+// 		History: {
+// 			screen: ReceiptHistoryContainer, navigationOptions: ({ navigation }) => ({
+// 				header: null
+// 			}),
+// 		},
+// 	},
+// 	{
+// 		initialRouteName: 'Home',
+// 		headerMode: 'screen',
+// 		mode: 'modal',
+// 	}
+// );
+
+const MainStack = FluidNavigator({
+	Home: { screen: HomeContainer },
+	History: { screen: ReceiptHistoryContainer },
+});
 
 
 interface IAppState {

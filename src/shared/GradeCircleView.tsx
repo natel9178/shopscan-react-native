@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { View, Text, StyleSheet, TextStyle, ViewStyle } from 'react-native';
+import { GradeColorManager, Grade } from '../home/models';
 
 interface IGradeCircleViewProps {
-  text?: string
+  grade?: Grade
   textStyle?: TextStyle
   viewStyle?: ViewStyle
 }
@@ -10,8 +11,8 @@ interface IGradeCircleViewProps {
 export default class GradeCircleView extends React.Component<IGradeCircleViewProps, {}> {
   public render() {
     return (
-      <View style={[styles.container, this.props.viewStyle]}>
-        <Text style={[styles.text, this.props.textStyle]}>{this.props.text}</Text>
+      <View style={[styles.container, this.props.viewStyle, { backgroundColor: GradeColorManager.getColorForGrade(this.props.grade) }]}>
+        <Text style={[styles.text, this.props.textStyle]}>{this.props.grade.toUpperCase()}</Text>
       </View>
     )
   }
@@ -25,9 +26,6 @@ const styles = StyleSheet.create({
     borderRadius: 70 / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 4,
-    marginBottom: 6,
-    margin: 8
   },
   text: {
     fontFamily: 'circular-bold',

@@ -1,12 +1,15 @@
 import React from 'react'
 import { Constants, Svg } from 'expo';
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, ViewStyle } from 'react-native'
 
+interface ICameraButtonProps {
+  style?: ViewStyle
+}
 
-export default class CameraButton extends React.Component<{}, {}> {
+export default class CameraButton extends React.Component<ICameraButtonProps, {}> {
   public render() {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, this.props.style]}>
         <Svg height={120} width={100}>
           <Svg.Circle
             cx={50}
