@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Dimensions, Image, LayoutAnimation } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Dimensions, Image, LayoutAnimation, Animated } from 'react-native';
 import { Camera, Permissions, BlurView } from 'expo';
 import { createStackNavigator } from 'react-navigation'
 import CameraView from './CameraView';
@@ -14,6 +14,7 @@ import { Transition } from 'react-navigation-fluid-transitions'
 import Modal from "react-native-modal";
 import { ImageAsset } from '../../assets/images';
 import * as Animatable from 'react-native-animatable';
+import ReceiptHistoryContainer from '../history/ReceiptHistory';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const ITEM_WIDTH = WINDOW_WIDTH - 100
@@ -23,15 +24,33 @@ interface IHomeContainerProps {
   navigation?: any
 }
 interface IHomeContainerState {
+  headerText: string
+  headerOpacity: Animated.Value
+
   type: Camera.Constants.Type
   modalVisible: boolean
+  historyVisible: boolean
   isLoading: boolean
 }
 
 export default class HomeContainer extends React.Component<IHomeContainerProps, IHomeContainerState> {
   constructor(props) {
     super(props)
-    this.state = { type: Camera.Constants.Type.front, modalVisible: false, isLoading: false }
+    this.state = { headerText: 'Welcome Nate', headerOpacity: new Animated.Value(1), type: Camera.Constants.Type.front, modalVisible: false, historyVisible: false, isLoading: false }
+  }
+
+  public componentDidMount() {
+    setTimeout(async () => {
+      await new Promise(resolve => Animated.timing(this.state.headerOpacity, {
+        toValue: 0,
+        duration: 300
+      }).start(resolve))
+      await new Promise(resolve => this.setState({ headerText: 'Recent Updates' }, resolve))
+      await new Promise(resolve => Animated.timing(this.state.headerOpacity, {
+        toValue: 1,
+        duration: 300
+      }).start(resolve))
+    }, 1500);
   }
 
   private flipCamera = () => {
@@ -43,7 +62,8 @@ export default class HomeContainer extends React.Component<IHomeContainerProps, 
   }
 
   private segueToHistory = () => {
-    this.props.navigation.navigate('History')
+    // this.props.navigation.navigate('History')
+    this.setState({ historyVisible: true })
   }
 
   private takePicture = () => {
@@ -60,7 +80,7 @@ export default class HomeContainer extends React.Component<IHomeContainerProps, 
         <CameraView style={styles.camera} type={this.state.type}>
           <SafeAreaView style={styles.cameraContentContainer}>
             <View style={styles.carouselTitleContainer}>
-              <Text style={styles.carouselTitle}>Recent Updates</Text>
+              <Animated.Text style={[styles.carouselTitle, { opacity: this.state.headerOpacity }]}>{this.state.headerText}</Animated.Text>
               <CarouselView items={[{ title: 'AB InBev', description: 'Conflict minerals rating', grade: Grade.F }, { title: 'AB InBev', description: 'Conflict minerals rating', grade: Grade.F }, { title: 'AB InBev', description: 'Conflict minerals rating', grade: Grade.F }]} />
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: '85%' }}>
@@ -85,12 +105,12 @@ export default class HomeContainer extends React.Component<IHomeContainerProps, 
               </Animatable.View>
             }
           </Modal>
-          {/* <View style={{
-            position: 'absolute', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'
-          }}>
-            < ReceiptCard style={{ width: ITEM_WIDTH, aspectRatio: 1 / 1.4 }} receipt={{ id: 'TransitonExample', title: '$92,000', grade: Grade.A }} />
-          </View> */}
         </CameraView>
+        <Modal style={{ margin: 0 }} backdropOpacity={0} animationOut={'fadeOut'} animationIn={'fadeIn'} hideModalContentWhileAnimating={true} isVisible={this.state.historyVisible} >
+          <ReceiptHistoryContainer onPressDismiss={() => {
+            this.setState({ historyVisible: false })
+          }} />
+        </Modal>
       </View >
     )
   }
@@ -99,6 +119,8 @@ export default class HomeContainer extends React.Component<IHomeContainerProps, 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   camera: {
     flex: 1,

@@ -7,12 +7,16 @@ import GradeCircleView from '../shared/GradeCircleView';
 import { Entypo } from '@expo/vector-icons';
 import ReceiptCard from './ReceiptCard';
 import { Transition } from 'react-navigation-fluid-transitions'
+import { BlurView } from 'expo';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const ITEM_WIDTH = WINDOW_WIDTH - 100
 const ITEM_HEIGHT = ITEM_WIDTH * 1.4
 const sampleData = [{ id: 'TransitonExample', title: 'June 24th', grade: Grade.A }, { id: 'boo', title: 'June 24th', grade: Grade.F }, { id: 'm', title: 'June 24th', grade: Grade.C }]
 
+interface IReceiptHistoryContainerProps {
+  onPressDismiss: () => void
+}
 interface IReceiptHistoryContainerState {
   focusedReceipt: Receipt
   backgroundColorAnim: Animated.Value
@@ -20,7 +24,7 @@ interface IReceiptHistoryContainerState {
   nextBackgroundColor: string
 }
 
-export default class ReceiptHistoryContainer extends React.Component<{}, IReceiptHistoryContainerState> {
+export default class ReceiptHistoryContainer extends React.Component<IReceiptHistoryContainerProps, IReceiptHistoryContainerState> {
   constructor(props) {
     super(props)
     this.state = { focusedReceipt: { id: 'TransitonExample', title: 'June 24th', grade: Grade.A }, backgroundColorAnim: new Animated.Value(0), backgroundColor: 'lightgreen', nextBackgroundColor: 'lightgreen' }
@@ -29,8 +33,14 @@ export default class ReceiptHistoryContainer extends React.Component<{}, IReceip
 
   public _renderItem({ item, index }, parallaxProps) {
     return (
-      <ReceiptCard style={{ height: ITEM_HEIGHT, width: ITEM_WIDTH }} receipt={item} parallaxProps={parallaxProps} />
+      <TouchableOpacity>
+        <ReceiptCard style={{ height: ITEM_HEIGHT, width: ITEM_WIDTH }} receipt={item} parallaxProps={parallaxProps} />
+      </TouchableOpacity>
     );
+  }
+
+  componentDidMount() {
+    this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(sampleData[0].grade))
   }
 
   private animateBackgroundToColor(color: string) {
@@ -46,37 +56,40 @@ export default class ReceiptHistoryContainer extends React.Component<{}, IReceip
 
   public render() {
     return (
-      <Animated.View style={[styles.container, {
-        backgroundColor: this.state.backgroundColorAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [this.state.backgroundColor, this.state.nextBackgroundColor]
-        })
-      }]} >
-        <View style={styles.textContainer} >
-          <Text style={styles.helloTitle}>Hello, Nate</Text>
-          <Text style={styles.subtitle}>Thanks for being ethical</Text>
-          <Text style={styles.subtitle}>You're about 15% from your goal</Text>
-        </View >
-        <View style={styles.carouselContainer}>
-          <Text style={styles.carouselTopText}>{'5/7 receipts with A- or higher'.toUpperCase()}</Text>
-          <View style={styles.carouselWrapper}>
-            <Carousel
-              style={styles.carousel}
-              ref={(c) => { this._carousel = c; }}
-              data={sampleData}
-              layout={'default'}
-              onBeforeSnapToItem={(i: number) => {
-                this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(sampleData[i].grade))
-                // this.setState({ focusedReceipt: sampleData[i] })
-              }}
-              renderItem={this._renderItem}
-              sliderWidth={WINDOW_WIDTH}
-              itemWidth={ITEM_WIDTH}
-              hasParallaxImages={true}
-            />
+      <BlurView tint='dark' intensity={97} style={{ flex: 1 }}>
+        <Animated.View style={[styles.container, {
+          backgroundColor: this.state.backgroundColorAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [this.state.backgroundColor, this.state.nextBackgroundColor]
+          })
+        }]} >
+          <Entypo.Button iconStyle={{ marginHorizontal: 12 }} name='chevron-thin-left' size={30} backgroundColor={'transparent'} color={'white'} onPress={this.props.onPressDismiss} />
+          <View style={styles.textContainer} >
+            <Text style={styles.helloTitle}>Hello, Nate</Text>
+            <Text style={styles.subtitle}>Thanks for being ethical</Text>
+            <Text style={styles.subtitle}>You're about 15% from your goal</Text>
+          </View >
+          <View style={styles.carouselContainer}>
+            <Text style={styles.carouselTopText}>{'5/7 receipts with A- or higher'.toUpperCase()}</Text>
+            <View style={styles.carouselWrapper}>
+              <Carousel
+                style={styles.carousel}
+                ref={(c) => { this._carousel = c; }}
+                data={sampleData}
+                layout={'default'}
+                onBeforeSnapToItem={(i: number) => {
+                  this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(sampleData[i].grade))
+                  // this.setState({ focusedReceipt: sampleData[i] })
+                }}
+                renderItem={this._renderItem}
+                sliderWidth={WINDOW_WIDTH}
+                itemWidth={ITEM_WIDTH}
+                hasParallaxImages={true}
+              />
+            </View>
           </View>
-        </View>
-      </Animated.View >
+        </Animated.View >
+      </BlurView>
     )
   }
 }
@@ -84,7 +97,6 @@ export default class ReceiptHistoryContainer extends React.Component<{}, IReceip
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgb(243,124,109)',
     justifyContent: 'center',
     alignItems: 'flex-start'
   },
@@ -114,7 +126,7 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT + 30
   },
   carousel: {
-    width: WINDOW_WIDTH + 20,
+    width: '100%',
     height: ITEM_HEIGHT
   }
 })

@@ -6,6 +6,7 @@ import CameraView from './home/CameraView';
 import HomeContainer from './home/HomeContainer';
 import ReceiptHistoryContainer from './history/ReceiptHistory';
 import { FluidNavigator } from 'react-navigation-fluid-transitions'
+import ReceiptDetails from './receiptview/ReceiptDetails';
 
 function forVertical(props) {
 	const { layout, position, scene } = props;
@@ -46,9 +47,16 @@ function forVertical(props) {
 // );
 
 const MainStack = FluidNavigator({
+	Details: { screen: ReceiptDetails },
 	Home: { screen: HomeContainer },
 	History: { screen: ReceiptHistoryContainer },
-});
+}, {
+		initialRouteName: 'Details',
+		transitionConfig: () => ({
+			containerStyle: {
+			}
+		}),
+	});
 
 
 interface IAppState {
