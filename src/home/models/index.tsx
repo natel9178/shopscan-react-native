@@ -8,6 +8,39 @@ export class Receipt {
   public id: string
   public title?: string
   public grade?: Grade
+  public receiptItems: ReceiptItem[] = []
+  private companies?: Set<Company>
+  public dateCaptured?: Date
+  public supermarket?: Company
+  public picture?: any
+
+  constructor(json: any) {
+    Object.assign(this, json)
+  }
+
+  public getCompanies() {
+    if (this.companies) return this.companies
+
+    var companies = new Set();
+    this.receiptItems.forEach((item: ReceiptItem) => {
+      companies.add(item.company.name)
+    })
+    this.companies = companies
+    return companies
+  }
+}
+
+
+class Company {
+  public name: string
+  public grade: Grade
+  public prediction: boolean
+}
+
+class ReceiptItem {
+  public id: number
+  public company: Company
+  public item: string
 }
 
 export class GradeColorManager {

@@ -6,6 +6,7 @@ interface ICameraViewProps {
   style: ViewStyle
   children: any
   type: Camera.Constants.Type
+  cameraRef: (ref: any) => void
 }
 
 interface ICameraViewState {
@@ -33,7 +34,7 @@ export default class CameraView extends React.Component<ICameraViewProps, ICamer
       return <Text>No access to camera</Text>;
     } else {
       return (
-        <Camera style={this.props.style} type={this.props.type}>
+        <Camera ref={this.props.cameraRef} style={this.props.style} type={this.props.type}>
           {this.props.children}
         </Camera>
       );

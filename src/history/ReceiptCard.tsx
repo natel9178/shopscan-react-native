@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { View, ViewStyle, Text, StyleSheet, Image } from 'react-native';
+import { View, ViewStyle, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { ParallaxImage } from 'react-native-snap-carousel';
 import GradeCircleView from '../shared/GradeCircleView';
 import { Entypo } from '@expo/vector-icons';
@@ -10,38 +10,41 @@ interface IReceiptCardProps {
   style?: ViewStyle
   receipt: Receipt
   parallaxProps?: any
+  onPress?: () => void
 }
 
 export default class ReceiptCard extends React.Component<IReceiptCardProps, {}> {
   public imageComponent() {
     return this.props.parallaxProps ?
       <ParallaxImage
-        source={ImageAsset.SAMPLE_RECEIPT}
+        source={this.props.receipt.picture}
         containerStyle={{ flex: 1 }}
         style={{ flex: 1 }}
         parallaxFactor={0.4}
         {...this.props.parallaxProps}
       />
       :
-      <Image style={{ flex: 1 }} source={ImageAsset.SAMPLE_RECEIPT} />
+      <Image style={{ flex: 1, width: '100%', height: '100%' }} source={this.props.receipt.picture} resizeMode={'cover'} />
   }
   public render() {
     return (
-      <View style={[styles.container, this.props.style]}>
-        <View style={styles.clippingContainer}>
-          {this.imageComponent()}
-          <View style={styles.overlayContainer}>
-            <View style={styles.topHeaderContainer}>
-              <GradeCircleView viewStyle={styles.gradeStyle} textStyle={styles.gradeText} grade={this.props.receipt.grade} />
-              <Entypo name='dots-three-vertical' size={20} color='white' />
-            </View>
-            <View style={styles.bottomContainer}>
-              <Text style={styles.subtitle}>7 Companies</Text>
-              <Text style={styles.title}>{this.props.receipt.title}</Text>
+      <TouchableOpacity onPress={this.props.onPress} activeOpacity={0.95}>
+        <View style={[styles.container, this.props.style]}>
+          <View style={styles.clippingContainer}>
+            {this.imageComponent()}
+            <View style={styles.overlayContainer}>
+              <View style={styles.topHeaderContainer}>
+                <GradeCircleView viewStyle={styles.gradeStyle} textStyle={styles.gradeText} grade={this.props.receipt.grade} />
+                <Entypo name='dots-three-vertical' size={20} color='white' />
+              </View>
+              <View style={styles.bottomContainer}>
+                <Text style={styles.subtitle}>{this.props.receipt.getCompanies().size} Companies</Text>
+                <Text style={styles.title}>{this.props.receipt.supermarket!.name} Run</Text>
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 }
