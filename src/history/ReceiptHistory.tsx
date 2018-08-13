@@ -8,39 +8,46 @@ import { Entypo } from '@expo/vector-icons';
 import ReceiptCard from './ReceiptCard';
 import { Transition } from 'react-navigation-fluid-transitions'
 import { BlurView } from 'expo';
+import ShopScanApi from '../api';
 
 const WINDOW_WIDTH = Dimensions.get('window').width
 const ITEM_WIDTH = WINDOW_WIDTH - 100
 const ITEM_HEIGHT = ITEM_WIDTH * 1.4
-const sampleData = [{ id: 'TransitonExample', title: 'June 24th', grade: Grade.A }, { id: 'boo', title: 'June 24th', grade: Grade.F }, { id: 'm', title: 'June 24th', grade: Grade.C }]
-
 interface IReceiptHistoryContainerProps {
   onPressDismiss: () => void
+  showDetail: (receipt: Receipt) => void
+  navigation?: any
 }
 interface IReceiptHistoryContainerState {
-  focusedReceipt: Receipt
   backgroundColorAnim: Animated.Value
   backgroundColor: string
   nextBackgroundColor: string
+  historyData: Receipt[]
 }
 
 export default class ReceiptHistoryContainer extends React.Component<IReceiptHistoryContainerProps, IReceiptHistoryContainerState> {
   constructor(props) {
     super(props)
-    this.state = { focusedReceipt: { id: 'TransitonExample', title: 'June 24th', grade: Grade.A }, backgroundColorAnim: new Animated.Value(0), backgroundColor: 'lightgreen', nextBackgroundColor: 'lightgreen' }
+    this.state = { backgroundColorAnim: new Animated.Value(0), backgroundColor: 'lightgreen', nextBackgroundColor: 'lightgreen', historyData: [] }
   }
   private _carousel: any
 
+
+
   public _renderItem({ item, index }, parallaxProps) {
+    const onRowPress = (item: Receipt) => {
+      this.props.showDetail(item)
+    }
+
     return (
-      <TouchableOpacity>
-        <ReceiptCard style={{ height: ITEM_HEIGHT, width: ITEM_WIDTH }} receipt={item} parallaxProps={parallaxProps} />
-      </TouchableOpacity>
+      <ReceiptCard style={{ height: ITEM_HEIGHT, width: ITEM_WIDTH }} receipt={item} parallaxProps={parallaxProps} onPress={() => { onRowPress(item) }} />
     );
   }
 
-  componentDidMount() {
-    this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(sampleData[0].grade))
+  public componentDidMount() {
+    this.setState({ historyData: ShopScanApi.getReceiptHistory() }, () => {
+      this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(this.state.historyData[0].grade))
+    })
   }
 
   private animateBackgroundToColor(color: string) {
@@ -66,22 +73,21 @@ export default class ReceiptHistoryContainer extends React.Component<IReceiptHis
           <Entypo.Button iconStyle={{ marginHorizontal: 12 }} name='chevron-thin-left' size={30} backgroundColor={'transparent'} color={'white'} onPress={this.props.onPressDismiss} />
           <View style={styles.textContainer} >
             <Text style={styles.helloTitle}>Hello, Nate</Text>
-            <Text style={styles.subtitle}>Thanks for being ethical</Text>
-            <Text style={styles.subtitle}>You're about 15% from your goal</Text>
+            <Text style={styles.subtitle}>You're doing great!</Text>
+            <Text style={styles.subtitle}>Try reducing f-rated companies next.</Text>
           </View >
           <View style={styles.carouselContainer}>
-            <Text style={styles.carouselTopText}>{'5/7 receipts with A- or higher'.toUpperCase()}</Text>
+            <Text style={styles.carouselTopText}>{`1/${this.state.historyData.length} receipts with A- or higher`.toUpperCase()}</Text>
             <View style={styles.carouselWrapper}>
               <Carousel
                 style={styles.carousel}
                 ref={(c) => { this._carousel = c; }}
-                data={sampleData}
+                data={this.state.historyData}
                 layout={'default'}
                 onBeforeSnapToItem={(i: number) => {
-                  this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(sampleData[i].grade))
-                  // this.setState({ focusedReceipt: sampleData[i] })
+                  this.animateBackgroundToColor(GradeColorManager.getBackgroundColorForGrade(this.state.historyData[i].grade))
                 }}
-                renderItem={this._renderItem}
+                renderItem={this._renderItem.bind(this)}
                 sliderWidth={WINDOW_WIDTH}
                 itemWidth={ITEM_WIDTH}
                 hasParallaxImages={true}

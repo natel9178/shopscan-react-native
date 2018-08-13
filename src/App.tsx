@@ -25,37 +25,17 @@ function forVertical(props) {
 	};
 }
 
-
-// const MainStack = createStackNavigator(
-// 	{
-// 		Home: {
-// 			screen: HomeContainer, navigationOptions: ({ navigation }) => ({
-// 				header: null
-// 			}),
-// 		},
-// 		History: {
-// 			screen: ReceiptHistoryContainer, navigationOptions: ({ navigation }) => ({
-// 				header: null
-// 			}),
-// 		},
-// 	},
-// 	{
-// 		initialRouteName: 'Home',
-// 		headerMode: 'screen',
-// 		mode: 'modal',
-// 	}
-// );
-
 const MainStack = FluidNavigator({
 	Details: { screen: ReceiptDetails },
 	Home: { screen: HomeContainer },
 	History: { screen: ReceiptHistoryContainer },
 }, {
-		initialRouteName: 'Details',
+		initialRouteName: 'Home',
 		transitionConfig: () => ({
 			containerStyle: {
 			}
 		}),
+		navigationOptions: { gesturesEnabled: false },
 	});
 
 
